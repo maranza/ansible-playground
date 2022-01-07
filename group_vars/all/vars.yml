@@ -1,0 +1,11 @@
+username: iac-vm
+packages:
+  - vim
+  - neofetch
+  - htop
+  - tmux
+  - speedtest-cli
+  - build-essential
+  - tree
+  - unzip
+  - net-tools

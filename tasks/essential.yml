@@ -1,0 +1,36 @@
+# Tasks file
+
+# Task - run sudo apt update && sudo apt upgrade
+- name: update packages
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+# Task - install eseential packages upon server init
+- name: Install essential packages
+  package:
+    name: "{{ packages }}" # vaiable
+    state: latest # indicate that we want latest version always
+
+# Task - disable ssh pass auth so we use ssh key
+- name: Disable SSH password auth
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^#PasswordAuthentication yes"
+    line: "PasswordAuthentication no"
+  register: sshd_config # register this file to monitor it for changes and apply accordingly if no changes do nothing
+
+# Task - 
+- name: Enable passwordless sudo for "{{ username }}"
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "^%wheel"
+    line: "{{ username }} ALL=(ALL) NOPASSWD: ALL"
+    validate: "/usr/sbin/visudo -cf %s"
+
+# Task - restart SSH service after changes
+- name: Restart SSH Daemon
+  service:
+    name: sshd
+    state: restart # what we want do
+  when: sshd_config.changed
